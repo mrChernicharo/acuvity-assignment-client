@@ -4,6 +4,8 @@ import { IEdge, INode } from "./types";
 type d3Node = INode & d3.SimulationNodeDatum;
 type d3Link = d3.SimulationLinkDatum<IEdge & any>;
 
+const categoryColors = d3.scaleOrdinal(d3.schemeCategory10);
+
 function resetChart(selector: string) {
   const canvas = document.querySelector(selector);
   if (canvas) {
@@ -11,14 +13,13 @@ function resetChart(selector: string) {
   }
 }
 
-const categoryColors = d3.scaleOrdinal(d3.schemeCategory10);
-
 const drawChart = (
   selector: string,
   data: { nodes: INode[]; links: IEdge[] },
   currentNode: INode,
   onNodeClick: (node: INode) => void
 ) => {
+  resetChart(selector);
   const svg = d3.select(selector);
   const width = +svg.attr("width");
   const height = +svg.attr("height");
@@ -28,7 +29,8 @@ const drawChart = (
   const simulation = d3
     .forceSimulation()
     .force("center", d3.forceCenter(width / 2, height / 2))
-    .force("charge", d3.forceManyBody().strength(-2000))
+
+    .force("charge", d3.forceManyBody().strength(-450))
     .force("collide", d3.forceCollide(10).strength(0.9))
     .force(
       "link",
@@ -117,4 +119,4 @@ const drawChart = (
   }
 };
 
-export { categoryColors, resetChart, drawChart };
+export { categoryColors, drawChart };
