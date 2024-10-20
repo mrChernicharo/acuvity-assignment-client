@@ -22,7 +22,7 @@ function App() {
     if (nodeId && data?.payload) {
       const { node, links, relatedNodes } = data.payload;
       setNodeInfo({ node, relatedNodes });
-      drawChart("#canvas", { nodes: [node, ...relatedNodes], links }, onNodeClick);
+      drawChart("#canvas", { nodes: [node, ...relatedNodes], links }, node, onNodeClick);
     }
 
     return () => {

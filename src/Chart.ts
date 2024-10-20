@@ -13,7 +13,12 @@ function resetChart(selector: string) {
 
 const categoryColors = d3.scaleOrdinal(d3.schemeCategory10);
 
-const drawChart = (selector: string, data: { nodes: INode[]; links: IEdge[] }, onNodeClick: (node: INode) => void) => {
+const drawChart = (
+  selector: string,
+  data: { nodes: INode[]; links: IEdge[] },
+  currentNode: INode,
+  onNodeClick: (node: INode) => void
+) => {
   const svg = d3.select(selector);
   const width = +svg.attr("width");
   const height = +svg.attr("height");
@@ -52,6 +57,8 @@ const drawChart = (selector: string, data: { nodes: INode[]; links: IEdge[] }, o
     .append("circle")
     .attr("r", nodeRadius)
     .attr("fill", (d) => categoryColors(String(d.category)))
+    .attr("stroke", (d) => (d.name === currentNode.name ? "#fff" : "transparent"))
+    .attr("stroke-width", (d) => (d.name === currentNode.name ? 4 : 1))
     .style("cursor", "pointer")
     .on("click", (ev) => {
       const { id, name, category } = ev.target["__data__"];
