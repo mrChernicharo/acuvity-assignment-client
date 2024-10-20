@@ -4,33 +4,38 @@ import { IEdge, INode } from "./types";
 type d3Node = INode & d3.SimulationNodeDatum;
 type d3Link = d3.SimulationLinkDatum<IEdge & any>;
 
-export const chart = (data: { nodes: INode[]; links: IEdge[] }) => {
-  const svg = d3.select("svg#canvas");
+function resetChart(selector: string) {
+  const canvas = document.querySelector(selector);
+  if (canvas) {
+    canvas.innerHTML = "";
+  }
+}
+
+const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+const drawChart = (selector: string, data: { nodes: INode[]; links: IEdge[] }) => {
+  const svg = d3.select(selector);
   const width = +svg.attr("width");
   const height = +svg.attr("height");
-
-  const color = d3.scaleOrdinal(d3.schemeCategory10);
+  const nodeRadius = 16;
 
   // Add "forces" to the simulation here
   const simulation = d3
     .forceSimulation()
     .force("center", d3.forceCenter(width / 2, height / 2))
-    .force("charge", d3.forceManyBody().strength(-100))
+    .force("charge", d3.forceManyBody().strength(-2000))
     .force("collide", d3.forceCollide(10).strength(0.9))
     .force(
       "link",
-      d3.forceLink().id(function (d) {
-        return d.id;
-      })
+      d3.forceLink().id((d) => (d as any).id)
     );
 
   const nodes: d3Node[] = data.nodes.map((d) => ({ ...d }));
   const links: d3Link[] = data.links.map((d) => ({ ...d, target: d.destination }));
 
-  // Add lines for every link in the dataset
   const link = svg
     .append("g")
-    .attr("class", "links")
+    // .attr("class", "links")
     .selectAll("line")
     .data(links)
     .enter()
@@ -38,30 +43,40 @@ export const chart = (data: { nodes: INode[]; links: IEdge[] }) => {
     .attr("stroke", "#fff")
     .attr("stroke-width", 2);
 
-  // Add circles for every node in the dataset
   const node = svg
     .append("g")
-    .attr("class", "nodes")
+    // .attr("class", "nodes")
     .selectAll("circle")
     .data(nodes)
     .enter()
     .append("circle")
-    .attr("r", 10)
+    .attr("r", nodeRadius)
     .attr("fill", (d) => color(String(d.category)))
-    .call(d3.drag().on("start", dragStart).on("drag", drag).on("end", dragEnd) as any);
+    .style("cursor", "pointer")
+    .on("click", (ev) => {
+      const { id, name, category } = ev.target["__data__"];
+      const node = { id, name, category };
+      console.log(node);
+      //   console.log({ ev, node });
+    });
 
-  // Basic tooltips
-  node.append("title").text(function (d) {
-    return d.name;
-  });
+  const text = svg
+    .append("g")
+    .selectAll("text")
+    .data(nodes)
+    .enter()
+    .append("text")
+    .attr("stroke", "#fff")
+    .attr("fill", "#fff")
+    .style("pointer-events", "none")
+    .text((d) => d.name);
 
-  // Attach nodes to the simulation, add listener on the "tick" event
+  node.call(d3.drag().on("start", dragStart).on("drag", drag).on("end", dragEnd) as any);
+
   simulation.nodes(nodes).on("tick", ticked);
 
-  // Associate the lines with the "link" force
   (simulation.force("link") as any).links(links);
 
-  // Dynamically update the position of the nodes/links as time passes
   function ticked() {
     link
       .attr("x1", (d) => d.source.x)
@@ -70,22 +85,29 @@ export const chart = (data: { nodes: INode[]; links: IEdge[] }) => {
       .attr("y2", (d) => d.target.y);
 
     node.attr("cx", (d) => d.x!).attr("cy", (d) => d.y!);
+    text.attr("x", (d) => d.x! - nodeRadius * 0.33).attr("y", (d) => d.y! + nodeRadius * 0.33);
   }
 
-  function dragStart(event) {
+  function dragStart(event: d3.D3DragEvent<SVGCircleElement, INode, d3Node>) {
     if (!event.active) simulation.alphaTarget(0.3).restart();
     event.subject.fx = event.subject.x;
     event.subject.fy = event.subject.y;
   }
 
-  function drag(event) {
-    event.subject.fx = event.x;
-    event.subject.fy = event.y;
+  function drag(event: d3.D3DragEvent<SVGCircleElement, INode, d3Node>) {
+    if (event.x > 0 && event.x < width) {
+      event.subject.fx = event.x;
+    }
+    if (event.y > 0 && event.y < height) {
+      event.subject.fy = event.y;
+    }
   }
 
-  function dragEnd(event) {
+  function dragEnd(event: d3.D3DragEvent<SVGCircleElement, INode, d3Node>) {
     if (!event.active) simulation.alphaTarget(0);
     event.subject.fx = null;
     event.subject.fy = null;
   }
 };
+
+export { resetChart, drawChart };

@@ -9,3 +9,8 @@ export interface IEdge {
   source: number;
   destination: number;
 }
+
+export interface NodeInfo {
+  node: INode;
+  relatedNodes: INode[];
+}

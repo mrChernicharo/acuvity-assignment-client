@@ -1,43 +1,42 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
-import { chart } from "./Chart";
+import { drawChart, resetChart } from "./Chart";
+import { NodeInfo } from "./types";
+import { DataBrowser } from "./DataBrowser";
 
 function App() {
   const [nodeId, setNodeId] = useState(1);
-  // const [chartSvg, setChartSvg] = useState<SVGSVGElement | null>(null);
+  const [nodeInfo, setNodeInfo] = useState<NodeInfo | null>(null);
 
-  const { isPending, data } = useQuery({
-    queryKey: ["repoData"],
+  const { data } = useQuery({
+    queryKey: [nodeId],
     queryFn: () => fetch(`http://localhost:3333/node/${nodeId}`).then((res) => res.json()),
   });
 
   useEffect(() => {
-    if (data?.payload) {
+    if (nodeId && data?.payload) {
       const { node, links, relatedNodes } = data.payload;
-      const nodes = [node, ...relatedNodes];
-
-      const chartData = { nodes, links };
-      console.log({ chartData });
-
-      const canvas = document.querySelector("#canvas");
-      if (canvas) {
-        canvas.innerHTML = "";
-        chart({ nodes, links });
-      }
-
-      // setChartSvg(res);
+      setNodeInfo({ node, relatedNodes });
+      drawChart("#canvas", { nodes: [node, ...relatedNodes], links });
     }
-  }, [data]);
+
+    return () => {
+      resetChart("#canvas");
+    };
+  }, [data, nodeId]);
+
+  useEffect(() => {
+    console.log(nodeId, data?.payload);
+  }, [nodeId, data]);
 
   return (
     <div className="w-screen">
       <h1 className="text-emerald-500 text-center">Acuvity</h1>
 
-      {/* <pre>{isPending ? "Loading..." : JSON.stringify(data.payload, null, 2)}</pre> */}
-
-      {/* <>{chartSvg}</> */}
       <svg id="canvas" width={600} height={400} />
+
+      <DataBrowser nodeInfo={nodeInfo} selectNode={setNodeId} />
     </div>
   );
 }
