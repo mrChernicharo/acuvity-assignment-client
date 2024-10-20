@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
-import { drawChart, resetChart } from "./Chart";
-import { NodeInfo } from "./types";
+import { categoryColors, drawChart, resetChart } from "./Chart";
+import { INode, NodeInfo } from "./types";
 import { DataBrowser } from "./DataBrowser";
 
 function App() {
@@ -14,11 +14,15 @@ function App() {
     queryFn: () => fetch(`http://localhost:3333/node/${nodeId}`).then((res) => res.json()),
   });
 
+  function onNodeClick(node: INode) {
+    setNodeId(node.id);
+  }
+
   useEffect(() => {
     if (nodeId && data?.payload) {
       const { node, links, relatedNodes } = data.payload;
       setNodeInfo({ node, relatedNodes });
-      drawChart("#canvas", { nodes: [node, ...relatedNodes], links });
+      drawChart("#canvas", { nodes: [node, ...relatedNodes], links }, onNodeClick);
     }
 
     return () => {
@@ -32,7 +36,9 @@ function App() {
 
   return (
     <div className="w-screen">
-      <h1 className="text-emerald-500 text-center">Acuvity</h1>
+      <h1 className="text-center" style={{ color: categoryColors("0") }}>
+        Acuvity
+      </h1>
 
       <svg id="canvas" width={600} height={400} />
 

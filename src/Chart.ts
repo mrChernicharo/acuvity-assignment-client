@@ -11,9 +11,9 @@ function resetChart(selector: string) {
   }
 }
 
-const color = d3.scaleOrdinal(d3.schemeCategory10);
+const categoryColors = d3.scaleOrdinal(d3.schemeCategory10);
 
-const drawChart = (selector: string, data: { nodes: INode[]; links: IEdge[] }) => {
+const drawChart = (selector: string, data: { nodes: INode[]; links: IEdge[] }, onNodeClick: (node: INode) => void) => {
   const svg = d3.select(selector);
   const width = +svg.attr("width");
   const height = +svg.attr("height");
@@ -51,13 +51,12 @@ const drawChart = (selector: string, data: { nodes: INode[]; links: IEdge[] }) =
     .enter()
     .append("circle")
     .attr("r", nodeRadius)
-    .attr("fill", (d) => color(String(d.category)))
+    .attr("fill", (d) => categoryColors(String(d.category)))
     .style("cursor", "pointer")
     .on("click", (ev) => {
       const { id, name, category } = ev.target["__data__"];
-      const node = { id, name, category };
-      console.log(node);
-      //   console.log({ ev, node });
+      const node: INode = { id, name, category };
+      onNodeClick(node);
     });
 
   const text = svg
@@ -69,15 +68,16 @@ const drawChart = (selector: string, data: { nodes: INode[]; links: IEdge[] }) =
     .attr("stroke", "#fff")
     .attr("fill", "#fff")
     .style("pointer-events", "none")
+    .style("font-family", "monospace")
     .text((d) => d.name);
 
   node.call(d3.drag().on("start", dragStart).on("drag", drag).on("end", dragEnd) as any);
 
-  simulation.nodes(nodes).on("tick", ticked);
+  simulation.nodes(nodes).on("tick", tick);
 
   (simulation.force("link") as any).links(links);
 
-  function ticked() {
+  function tick() {
     link
       .attr("x1", (d) => d.source.x)
       .attr("y1", (d) => d.source.y)
@@ -85,7 +85,7 @@ const drawChart = (selector: string, data: { nodes: INode[]; links: IEdge[] }) =
       .attr("y2", (d) => d.target.y);
 
     node.attr("cx", (d) => d.x!).attr("cy", (d) => d.y!);
-    text.attr("x", (d) => d.x! - nodeRadius * 0.33).attr("y", (d) => d.y! + nodeRadius * 0.33);
+    text.attr("x", (d) => d.x! - nodeRadius * 0.25).attr("y", (d) => d.y! + nodeRadius * 0.25);
   }
 
   function dragStart(event: d3.D3DragEvent<SVGCircleElement, INode, d3Node>) {
@@ -95,10 +95,10 @@ const drawChart = (selector: string, data: { nodes: INode[]; links: IEdge[] }) =
   }
 
   function drag(event: d3.D3DragEvent<SVGCircleElement, INode, d3Node>) {
-    if (event.x > 0 && event.x < width) {
+    if (event.x > nodeRadius && event.x < width - nodeRadius) {
       event.subject.fx = event.x;
     }
-    if (event.y > 0 && event.y < height) {
+    if (event.y > nodeRadius && event.y < height - nodeRadius) {
       event.subject.fy = event.y;
     }
   }
@@ -110,4 +110,4 @@ const drawChart = (selector: string, data: { nodes: INode[]; links: IEdge[] }) =
   }
 };
 
-export { resetChart, drawChart };
+export { categoryColors, resetChart, drawChart };
