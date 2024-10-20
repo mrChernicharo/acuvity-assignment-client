@@ -1,69 +1,67 @@
 import * as d3 from "d3";
 import { IEdge, INode } from "./types";
 
-export const chart = (data: { nodes: INode[]; links: IEdge[] }) => {
-  // Specify the dimensions of the chart.
-  const width = 928;
-  const height = 600;
+type d3Node = INode & d3.SimulationNodeDatum;
+type d3Link = d3.SimulationLinkDatum<IEdge & any>;
 
-  // Specify the color scale.
+export const chart = (data: { nodes: INode[]; links: IEdge[] }) => {
+  const svg = d3.select("svg#canvas");
+  const width = +svg.attr("width");
+  const height = +svg.attr("height");
+
   const color = d3.scaleOrdinal(d3.schemeCategory10);
 
-  // The force simulation mutates links and nodes, so create a copy
-  // so that re-evaluating this cell produces the same result.
-  //   const links = data.links.map((d) => ({ ...d, id: String(d.id), target: d.destination }));
-  //   const nodes = data.nodes.map((d) => ({ ...d, id: String(d.id) }));
-
-  const nodes = data.nodes.map((d) => ({ ...d }));
-  const links = data.links.map((d) => ({ ...d, target: d.destination }));
-  console.log("chart:::1", { nodes, links });
-
-  // Create a simulation with several forces.
+  // Add "forces" to the simulation here
   const simulation = d3
-    .forceSimulation(nodes as d3.SimulationNodeDatum[])
+    .forceSimulation()
+    .force("center", d3.forceCenter(width / 2, height / 2))
+    .force("charge", d3.forceManyBody().strength(-100))
+    .force("collide", d3.forceCollide(10).strength(0.9))
     .force(
       "link",
-      d3.forceLink(links).id((d) => d.id)
-    )
-    .force("charge", d3.forceManyBody())
-    .force("center", d3.forceCenter(width / 2, height / 2))
-    .on("tick", ticked);
+      d3.forceLink().id(function (d) {
+        return d.id;
+      })
+    );
 
-  // Create the SVG container.
-  const svg = d3
-    // .create("svg")
-    .select("svg")
-    .attr("width", width)
-    .attr("height", height)
-    .attr("viewBox", [0, 0, width, height])
-    .attr("style", "max-width: 100%; height: auto;");
+  const nodes: d3Node[] = data.nodes.map((d) => ({ ...d }));
+  const links: d3Link[] = data.links.map((d) => ({ ...d, target: d.destination }));
 
-  // Add a line for each link, and a circle for each node.
+  // Add lines for every link in the dataset
   const link = svg
     .append("g")
-    .attr("stroke", "#999")
-    .attr("stroke-opacity", 0.6)
-    .selectAll()
+    .attr("class", "links")
+    .selectAll("line")
     .data(links)
-    .join("line")
-    .attr("stroke-width", (d) => 2);
+    .enter()
+    .append("line")
+    .attr("stroke", "#fff")
+    .attr("stroke-width", 2);
 
+  // Add circles for every node in the dataset
   const node = svg
     .append("g")
-    .attr("stroke", "#fff")
-    .attr("stroke-width", 1.5)
-    .selectAll()
+    .attr("class", "nodes")
+    .selectAll("circle")
     .data(nodes)
-    .join("circle")
-    .attr("r", 5)
-    .attr("fill", (d) => color(String(d.category)));
+    .enter()
+    .append("circle")
+    .attr("r", 10)
+    .attr("fill", (d) => color(String(d.category)))
+    .call(d3.drag().on("start", dragStart).on("drag", drag).on("end", dragEnd) as any);
 
-  node.append("title").text((d) => d.id);
+  // Basic tooltips
+  node.append("title").text(function (d) {
+    return d.name;
+  });
 
-  // Add a drag behavior.
-  node.call(d3.drag().on("start", dragstarted).on("drag", dragged).on("end", dragended));
+  // Attach nodes to the simulation, add listener on the "tick" event
+  simulation.nodes(nodes).on("tick", ticked);
 
-  // Set the position attributes of links and nodes each time the simulation ticks.
+  // Associate the lines with the "link" force
+  (simulation.force("link") as any).links(links);
+
+  // Dynamically update the position of the nodes/links as time passes
   function ticked() {
     link
       .attr("x1", (d) => d.source.x)
@@ -71,35 +69,23 @@ export const chart = (data: { nodes: INode[]; links: IEdge[] }) => {
       .attr("x2", (d) => d.target.x)
       .attr("y2", (d) => d.target.y);
 
-    node.attr("cx", (d) => d.x).attr("cy", (d) => d.y);
+    node.attr("cx", (d) => d.x!).attr("cy", (d) => d.y!);
   }
 
-  // Reheat the simulation when drag starts, and fix the subject position.
-  function dragstarted(event: any) {
+  function dragStart(event) {
     if (!event.active) simulation.alphaTarget(0.3).restart();
     event.subject.fx = event.subject.x;
     event.subject.fy = event.subject.y;
   }
 
-  // Update the subject (dragged node) position during drag.
-  function dragged(event: any) {
+  function drag(event) {
     event.subject.fx = event.x;
     event.subject.fy = event.y;
   }
 
-  // Restore the target alpha so the simulation cools after dragging ends.
-  // Unfix the subject position now that it’s no longer being dragged.
-  function dragended(event: any) {
+  function dragEnd(event) {
     if (!event.active) simulation.alphaTarget(0);
     event.subject.fx = null;
     event.subject.fy = null;
   }
-
-  // When this cell is re-run, stop the previous simulation. (This doesn’t
-  // really matter since the target alpha is zero and the simulation will
-  // stop naturally, but it’s a good practice.)
-  //   invalidation.then(() => simulation.stop());
-
-  return svg.node()?.getHTML();
-  //   return svg.node()?.getHTML();
 };

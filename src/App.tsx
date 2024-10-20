@@ -20,14 +20,12 @@ function App() {
       const chartData = { nodes, links };
       console.log({ chartData });
 
-      const chartSVG = chart({ nodes, links });
-
-      if (chartSVG) {
-        const canvas = document.querySelector("#canvas");
-        if (canvas) {
-          canvas.innerHTML = chartSVG;
-        }
+      const canvas = document.querySelector("#canvas");
+      if (canvas) {
+        canvas.innerHTML = "";
+        chart({ nodes, links });
       }
+
       // setChartSvg(res);
     }
   }, [data]);
@@ -39,7 +37,7 @@ function App() {
       {/* <pre>{isPending ? "Loading..." : JSON.stringify(data.payload, null, 2)}</pre> */}
 
       {/* <>{chartSvg}</> */}
-      <svg id="canvas" />
+      <svg id="canvas" width={600} height={400} />
     </div>
   );
 }
