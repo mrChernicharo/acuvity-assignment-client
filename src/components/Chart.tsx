@@ -1,6 +1,6 @@
 import { throttle } from "lodash";
 import { useState, useEffect } from "react";
-import { drawChart } from "../utils/chartFns";
+import { drawChart, resetChart } from "../utils/chartFns";
 
 export function Chart({ data, onNodeClick }: { data: any; onNodeClick: any }) {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -9,7 +9,10 @@ export function Chart({ data, onNodeClick }: { data: any; onNodeClick: any }) {
   function handleDrawChart() {
     if (data) {
       const { node, links, relatedNodes } = data;
-      drawChart("#canvas", { nodes: [node, ...relatedNodes], links }, node, onNodeClick);
+      drawChart("#canvas", { nodes: [], links: [] }, node, onNodeClick);
+      setTimeout(() => {
+        drawChart("#canvas", { nodes: [node, ...relatedNodes], links }, node, onNodeClick);
+      }, 200);
     }
   }
 
@@ -22,7 +25,11 @@ export function Chart({ data, onNodeClick }: { data: any; onNodeClick: any }) {
   }
 
   useEffect(() => {
+    // setTimeout(handleDrawChart, 100);
     handleDrawChart();
+    return () => {
+      resetChart("#canvas");
+    };
   }, [data]);
 
   useEffect(() => {

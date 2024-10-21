@@ -20,17 +20,17 @@ const drawChart = (
   onNodeClick: (node: INode) => void
 ) => {
   resetChart(selector);
+
   const svg = d3.select(selector);
   const width = +svg.attr("width");
   const height = +svg.attr("height");
-  const nodeRadius = 16;
+  const nodeRadius = 12;
 
   // Add "forces" to the simulation here
   const simulation = d3
     .forceSimulation()
     .force("center", d3.forceCenter(width / 2, height / 2))
-
-    .force("charge", d3.forceManyBody().strength(-450))
+    .force("charge", d3.forceManyBody().strength(-150))
     .force("collide", d3.forceCollide(10).strength(0.9))
     .force(
       "link",
@@ -42,7 +42,7 @@ const drawChart = (
 
   const link = svg
     .append("g")
-    // .attr("class", "links")
+    .attr("class", "links")
     .selectAll("line")
     .data(links)
     .enter()
@@ -52,7 +52,7 @@ const drawChart = (
 
   const node = svg
     .append("g")
-    // .attr("class", "nodes")
+    .attr("class", "nodes")
     .selectAll("circle")
     .data(nodes)
     .enter()
@@ -68,9 +68,11 @@ const drawChart = (
       const node: INode = { id, name, category };
       onNodeClick(node);
     });
+  // .style("display", "none");
 
   const text = svg
     .append("g")
+    .attr("class", "text")
     .selectAll("text")
     .data(nodes)
     .enter()
@@ -120,4 +122,4 @@ const drawChart = (
   }
 };
 
-export { categoryColors, drawChart };
+export { categoryColors, drawChart, resetChart };

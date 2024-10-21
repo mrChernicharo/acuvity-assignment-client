@@ -2,6 +2,7 @@ export interface INode {
   id: number;
   name: string;
   category: number;
+  directNeighbor?: boolean;
 }
 
 export interface INodeFull extends INode {
