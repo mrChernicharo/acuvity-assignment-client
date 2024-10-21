@@ -12,8 +12,8 @@ export function NodeNeighbors({
 }) {
   return (
     <>
-      <div className="text-left w-full translate-y-2">{node.name}'s neighbors</div>
-      <ul className="flex gap-2 px-6 pb-8 pt-1 w-screen overflow-x-auto">
+      <div className="text-left w-full translate-y-4 sm:translate-y-2">{node.name}'s neighbors</div>
+      <ul className="flex gap-2 px-6 pb-4 sm:pb-8 pt-1 w-screen overflow-x-auto">
         {neighbors
           .filter((n) => n.directNeighbor)
           .map((n) => (

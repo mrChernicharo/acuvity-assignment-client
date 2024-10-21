@@ -23,8 +23,8 @@ export function NodeDetails({ node }: { node: INodeFull }) {
         <div className="flex items-center gap-2">
           <FaBuilding /> {node.company}
         </div>
-        <div>age: {age}</div>
-        <div>registered at: {dateIntl.format(new Date(node.registeredAt))}</div>
+        <div className="hidden sm:block">age: {age}</div>
+        <div className="hidden sm:block">registered at: {dateIntl.format(new Date(node.registeredAt))}</div>
         <div className="flex items-center gap-2">
           <GiMeal /> {node.favoriteFood}
         </div>
