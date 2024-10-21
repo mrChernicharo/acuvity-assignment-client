@@ -21,6 +21,7 @@ function App() {
   useEffect(() => {
     if (nodeId && data?.payload) {
       const { node, relatedNodes } = data.payload;
+      console.log({ node, relatedNodes });
       setNodeInfo({ node, relatedNodes });
     }
   }, [data, nodeId]);

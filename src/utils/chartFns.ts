@@ -24,13 +24,12 @@ const drawChart = (
   const svg = d3.select(selector);
   const width = +svg.attr("width");
   const height = +svg.attr("height");
-  const nodeRadius = 12;
+  const nodeRadius = 8;
 
-  // Add "forces" to the simulation here
   const simulation = d3
     .forceSimulation()
     .force("center", d3.forceCenter(width / 2, height / 2))
-    .force("charge", d3.forceManyBody().strength(-150))
+    .force("charge", d3.forceManyBody().strength(-200))
     .force("collide", d3.forceCollide(10).strength(0.9))
     .force(
       "link",
@@ -68,7 +67,6 @@ const drawChart = (
       const node: INode = { id, name, category };
       onNodeClick(node);
     });
-  // .style("display", "none");
 
   const text = svg
     .append("g")
@@ -79,6 +77,7 @@ const drawChart = (
     .append("text")
     .attr("stroke", "#fff")
     .attr("fill", "#000")
+    .style("font-size", 12)
     .style("pointer-events", "none")
     .style("font-family", "monospace")
     .text((d) => d.name);
@@ -97,7 +96,8 @@ const drawChart = (
       .attr("y2", (d) => d.target.y);
 
     node.attr("cx", (d) => d.x!).attr("cy", (d) => d.y!);
-    text.attr("x", (d) => d.x! - nodeRadius * 0.25).attr("y", (d) => d.y! + nodeRadius * 0.25);
+    // text.attr("x", (d) => d.x!).attr("y", (d) => d.y!);
+    text.attr("x", (d) => d.x!).attr("y", (d) => d.y! - nodeRadius * 0.25);
   }
 
   function dragStart(event: d3.D3DragEvent<SVGCircleElement, INode, d3Node>) {

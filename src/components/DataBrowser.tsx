@@ -19,7 +19,7 @@ export function DataBrowser({ nodeInfo, selectNode }: Props) {
   const age = Math.floor((Date.now() - new Date(node.birthDate).getTime()) / (365 * 24 * 60 * 60 * 1000));
 
   return (
-    <div className="fixed bottom-0 w-screen border-t border-gray-500">
+    <div className="fixed bottom-0 w-screen border-t border-gray-500 bg-gray-800">
       <div className="flex flex-col items-center space-y-6 px-6">
         <div className="flex gap-4 translate-y-4">
           <div className="p-2 rounded-lg" style={{ background: categoryColors(String(node.category)) }}>

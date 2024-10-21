@@ -1,4 +1,4 @@
-import { debounce, throttle } from "lodash";
+import { debounce } from "lodash";
 import { useState, useEffect } from "react";
 import { drawChart, resetChart } from "../utils/chartFns";
 
@@ -9,10 +9,7 @@ export function Chart({ data, onNodeClick }: { data: any; onNodeClick: any }) {
   function handleDrawChart() {
     if (data) {
       const { node, links, relatedNodes } = data;
-      // drawChart("#canvas", { nodes: [], links: [] }, node, onNodeClick);
-      // setTimeout(() => {
       drawChart("#canvas", { nodes: [node, ...relatedNodes], links }, node, onNodeClick);
-      // }, 200);
     }
   }
 
