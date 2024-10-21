@@ -1,6 +1,6 @@
 import { throttle } from "lodash";
 import { useState, useEffect } from "react";
-import { drawChart } from "./chartFns";
+import { drawChart } from "../utils/chartFns";
 
 export function Chart({ data, onNodeClick }: { data: any; onNodeClick: any }) {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -32,5 +32,5 @@ export function Chart({ data, onNodeClick }: { data: any; onNodeClick: any }) {
     };
   }, []);
 
-  return <svg id="canvas" width={windowWidth} height={windowHeight - 368} />;
+  return <svg id="canvas" width={windowWidth} height={windowHeight - 328} />;
 }

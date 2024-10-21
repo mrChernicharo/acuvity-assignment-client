@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { INode, NodeInfo } from "./types";
-import { DataBrowser } from "./DataBrowser";
-import { Header } from "./Header";
-import { Chart } from "./Chart";
+import { INode, NodeInfo } from "./utils/types";
+import { DataBrowser } from "./components/DataBrowser";
+import { Header } from "./components/Header";
+import { Chart } from "./components/Chart";
 
 function App() {
   const [nodeId, setNodeId] = useState(1);
