@@ -47,7 +47,7 @@ const drawChart = (
     .data(links)
     .enter()
     .append("line")
-    .attr("stroke", "#fff")
+    .attr("stroke", "#ffffff45")
     .attr("stroke-width", 2);
 
   const node = svg
@@ -59,8 +59,9 @@ const drawChart = (
     .append("circle")
     .attr("r", nodeRadius)
     .attr("fill", (d) => categoryColors(String(d.category)))
-    .attr("stroke", (d) => (d.name === currentNode.name ? "#fff" : "transparent"))
-    .attr("stroke-width", (d) => (d.name === currentNode.name ? 4 : 1))
+    .attr("stroke", (d) => (d.name === currentNode.name ? "#fff" : ""))
+    .attr("stroke-dasharray", 4)
+    .attr("stroke-width", (d) => (d.name === currentNode.name ? 2 : 1))
     .style("cursor", "pointer")
     .on("click", (ev) => {
       const { id, name, category } = ev.target["__data__"];
@@ -75,7 +76,7 @@ const drawChart = (
     .enter()
     .append("text")
     .attr("stroke", "#fff")
-    .attr("fill", "#fff")
+    .attr("fill", "#000")
     .style("pointer-events", "none")
     .style("font-family", "monospace")
     .text((d) => d.name);
