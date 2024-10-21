@@ -20,9 +20,13 @@ export interface IEdge {
   destination: number;
 }
 
-export interface NodeInfo {
+export interface GraphInfo {
   node: INode;
   relatedNodes: INode[];
+}
+
+export interface ChartData extends GraphInfo {
+  links: IEdge[];
 }
 
 export interface EntryCounts {

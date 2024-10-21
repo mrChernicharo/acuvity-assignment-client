@@ -2,7 +2,7 @@ import type { EntryCounts } from "../utils/types";
 
 const intl = new Intl.NumberFormat("en-us", { notation: "compact" });
 
-export function TotalCount({ entryCounts }: { entryCounts: EntryCounts | null }) {
+export function TotalCounts({ entryCounts }: { entryCounts: EntryCounts | null }) {
   if (!entryCounts?.nodes || !entryCounts?.edges) return null;
 
   return (

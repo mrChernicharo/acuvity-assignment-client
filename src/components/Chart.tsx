@@ -1,23 +1,24 @@
 import { debounce } from "lodash";
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { drawChart, resetChart } from "../utils/chartFns";
+import { ChartData, INode } from "../utils/types";
 
-export function Chart({ data, onNodeClick }: { data: any; onNodeClick: any }) {
+export function Chart({ data, onNodeClick }: { data: ChartData | null; onNodeClick: (node: INode) => void }) {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [windowHeight, setWindowHeight] = useState(window.innerHeight);
 
-  function handleDrawChart() {
+  const handleDrawChart = useCallback(() => {
     if (data) {
       const { node, links, relatedNodes } = data;
       drawChart("#canvas", { nodes: [node, ...relatedNodes], links }, node, onNodeClick);
     }
-  }
+  }, [data, drawChart, onNodeClick]);
 
-  function onResize() {
+  const onResize = useCallback(() => {
     setWindowWidth(window.innerWidth);
     setWindowHeight(window.innerHeight);
-    handleDrawChart();
-  }
+    setTimeout(handleDrawChart, 200);
+  }, [handleDrawChart]);
 
   useEffect(() => {
     handleDrawChart();
@@ -27,11 +28,11 @@ export function Chart({ data, onNodeClick }: { data: any; onNodeClick: any }) {
   }, [data]);
 
   useEffect(() => {
-    window.addEventListener("resize", debounce(onResize, 1200));
+    window.addEventListener("resize", debounce(onResize, 600));
     return () => {
       window.removeEventListener("resize", onResize);
     };
-  }, []);
+  }, [onResize]);
 
   return <svg id="canvas" width={windowWidth} height={windowHeight - 336} />;
 }

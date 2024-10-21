@@ -1,20 +1,22 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import type { EntryCounts, INode, NodeInfo } from "./utils/types";
+import type { EntryCounts, INode, GraphInfo } from "./utils/types";
 import { DataBrowser } from "./components/DataBrowser";
 import { Header } from "./components/Header";
 import { Chart } from "./components/Chart";
-import { TotalCount } from "./components/TotalCount";
+import { TotalCounts } from "./components/TotalCounts";
 
 function App() {
   const [nodeId, setNodeId] = useState(1);
-  const [nodeInfo, setNodeInfo] = useState<NodeInfo | null>(null);
+  const [nodeInfo, setNodeInfo] = useState<GraphInfo | null>(null);
   const [entryCounts, setEntryCounts] = useState<EntryCounts | null>(null);
 
   const { data } = useQuery({
     queryKey: [`node-${nodeId}`],
     queryFn: () => fetch(`http://localhost:3333/node/${nodeId}`).then((res) => res.json()),
   });
+
+  const chartData = data?.payload;
 
   function onNodeClick(node: INode) {
     setNodeId(node.id);
@@ -34,9 +36,9 @@ function App() {
     <div className="w-screen">
       <Header />
 
-      <TotalCount entryCounts={entryCounts} />
+      <TotalCounts entryCounts={entryCounts} />
 
-      <Chart data={data?.payload} onNodeClick={onNodeClick} />
+      <Chart data={chartData} onNodeClick={onNodeClick} />
 
       <DataBrowser nodeInfo={nodeInfo} selectNode={setNodeId} />
     </div>
