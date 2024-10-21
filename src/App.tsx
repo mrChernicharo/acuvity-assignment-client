@@ -1,13 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { INode, NodeInfo } from "./utils/types";
+import type { EntryCounts, INode, NodeInfo } from "./utils/types";
 import { DataBrowser } from "./components/DataBrowser";
 import { Header } from "./components/Header";
 import { Chart } from "./components/Chart";
+import { TotalCount } from "./components/TotalCount";
 
 function App() {
   const [nodeId, setNodeId] = useState(1);
   const [nodeInfo, setNodeInfo] = useState<NodeInfo | null>(null);
+  const [entryCounts, setEntryCounts] = useState<EntryCounts | null>(null);
 
   const { data } = useQuery({
     queryKey: [`node-${nodeId}`],
@@ -20,15 +22,19 @@ function App() {
 
   useEffect(() => {
     if (nodeId && data?.payload) {
-      const { node, relatedNodes } = data.payload;
-      console.log({ node, relatedNodes });
+      const { node, relatedNodes, nodeCount, edgeCount } = data.payload;
       setNodeInfo({ node, relatedNodes });
+      if (!entryCounts) {
+        setEntryCounts({ nodes: nodeCount, edges: edgeCount });
+      }
     }
-  }, [data, nodeId]);
+  }, [data, nodeId, entryCounts]);
 
   return (
     <div className="w-screen">
       <Header />
+
+      <TotalCount entryCounts={entryCounts} />
 
       <Chart data={data?.payload} onNodeClick={onNodeClick} />
 

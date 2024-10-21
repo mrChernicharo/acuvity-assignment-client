@@ -24,3 +24,8 @@ export interface NodeInfo {
   node: INode;
   relatedNodes: INode[];
 }
+
+export interface EntryCounts {
+  nodes: number;
+  edges: number;
+}

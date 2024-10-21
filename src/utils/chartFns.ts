@@ -56,11 +56,11 @@ const drawChart = (
     .data(nodes)
     .enter()
     .append("circle")
-    .attr("r", nodeRadius)
+    .attr("r", (d) => (d.id === currentNode.id ? nodeRadius * 1.6 : nodeRadius))
     .attr("fill", (d) => categoryColors(String(d.category)))
-    .attr("stroke", (d) => (d.name === currentNode.name ? "#fff" : ""))
+    .attr("stroke", (d) => (d.id === currentNode.id ? "#ffffff99" : ""))
+    .attr("stroke-width", (d) => (d.id === currentNode.id ? 4 : 0))
     .attr("stroke-dasharray", 4)
-    .attr("stroke-width", (d) => (d.name === currentNode.name ? 2 : 1))
     .style("cursor", "pointer")
     .on("click", (ev) => {
       const { id, name, category } = ev.target["__data__"];
@@ -76,10 +76,9 @@ const drawChart = (
     .enter()
     .append("text")
     .attr("stroke", "#fff")
-    .attr("fill", "#000")
-    .style("font-size", 12)
+    .attr("fill", "#fff")
+    .style("font-size", (d) => (d.id === currentNode.id ? "16px" : "12px"))
     .style("pointer-events", "none")
-    .style("font-family", "monospace")
     .text((d) => d.name);
 
   node.call(d3.drag().on("start", dragStart).on("drag", drag).on("end", dragEnd) as any);
