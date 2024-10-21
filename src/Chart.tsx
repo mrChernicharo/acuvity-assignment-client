@@ -7,8 +7,8 @@ export function Chart({ data, onNodeClick }: { data: any; onNodeClick: any }) {
   const [windowHeight, setWindowHeight] = useState(window.innerHeight);
 
   function handleDrawChart() {
-    if (data?.payload) {
-      const { node, links, relatedNodes } = data.payload;
+    if (data) {
+      const { node, links, relatedNodes } = data;
       drawChart("#canvas", { nodes: [node, ...relatedNodes], links }, node, onNodeClick);
     }
   }

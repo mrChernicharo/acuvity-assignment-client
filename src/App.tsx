@@ -29,7 +29,7 @@ function App() {
     <div className="w-screen">
       <Header />
 
-      <Chart data={data} onNodeClick={onNodeClick} />
+      <Chart data={data?.payload} onNodeClick={onNodeClick} />
 
       <DataBrowser nodeInfo={nodeInfo} selectNode={setNodeId} />
     </div>
